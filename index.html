@@ -23,11 +23,180 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="manifest" href="site.webmanifest"> -->
 
+
 </head>
+<style>
+  /* 입력 UI */
+  .form-label{display:block;margin-bottom:.5rem;font-weight:600;}
+  .form-input, .form-textarea{
+    width:100%; padding:.9rem 1rem; border:1px solid #ddd; border-radius:.5rem; 
+    background:#fff; font:inherit; outline:none;
+  }
+  .form-input:focus, .form-textarea:focus{border-color:#999;}
+  .btn.btn--primary{padding:.9rem 1.3rem; border:none; border-radius:.6rem; cursor:pointer;}
+  .btn[aria-busy="true"]{opacity:.6; pointer-events:none;}
+
+  /* 모달 */
+  .modal{position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; z-index:9999;}
+  .modal.is-open{display:block;}
+  .modal__dialog{
+    position:relative; margin:5vh auto; max-width:680px; background:#fff; 
+    border-radius:12px; padding:1rem 1rem 1.25rem; box-shadow:0 10px 30px rgba(0,0,0,.2);
+  }
+  .modal__header{display:flex; justify-content:space-between; align-items:center; padding:.25rem .5rem .75rem;}
+  .modal__close{background:none; border:none; font-size:1.5rem; line-height:1; cursor:pointer;}
+  .modal__body{padding:0 .5rem .5rem; max-height:60vh; overflow:auto;}
+  .modal__body p{margin:.5rem 0;}
+</style>
+
+<script>
+  // 페이지 로드 시 폼 초기화 (위의 type="module"에서 window.__initInquiryForm 노출)
+  window.addEventListener('DOMContentLoaded', function(){
+    if (typeof window.__initInquiryForm === 'function') {
+      window.__initInquiryForm();
+    }
+  });
+</script>
+<script type="module">
+  // Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+  // 너의 프로젝트 설정 (현재 페이지에 쓰던 것 그대로)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBclpD0n_8KnYury2JOsC2uaDGO1sbgF0",
+    authDomain: "developer-designer.firebaseapp.com",
+    projectId: "developer-designer",
+    storageBucket: "developer-designer.firebasestorage.app",
+    messagingSenderId: "329935817932",
+    appId: "1:329935817932:web:8982ae8bc61cc070e4c669",
+    measurementId: "G-GRHFW6R8JM"
+  };
+
+  // Init
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
+
+  // ------ 입력 유효성 ------
+  function attachInputValidation() {
+    const nameInput = document.getElementById("input_name");
+    const phoneInput1 = document.getElementById("input_hp1");
+    const phoneInput2 = document.getElementById("input_hp2");
+
+    // 이름: 한글/영문만
+    nameInput?.addEventListener("input", (e) => {
+      const v = e.target.value;
+      if (/[^가-힣a-zA-Z\s]/.test(v)) {
+        showFeedback("이름에는 한글·영문만 입력 가능합니다.", nameInput);
+      } else {
+        clearFeedback(nameInput);
+      }
+    });
+
+    // 번호: 숫자만
+    [phoneInput1, phoneInput2].forEach((el) => {
+      el?.addEventListener("input", (e) => {
+        e.target.value = e.target.value.replace(/\D/g, "");
+        const v = e.target.value;
+        if (/[^0-9]/.test(v)) {
+          showFeedback("휴대폰 번호는 숫자만 입력 가능합니다.", el);
+        } else {
+          clearFeedback(el);
+        }
+      });
+    });
+
+    function showFeedback(message, inputEl) {
+      const parent = inputEl.parentElement;
+      if (!parent) return;
+      const exist = parent.querySelector(".feedback");
+      if (exist) { exist.textContent = message; return; }
+      const p = document.createElement("p");
+      p.className = "feedback";
+      p.style.color = "red";
+      p.style.marginTop = "6px";
+      p.textContent = message;
+      parent.appendChild(p);
+    }
+    function clearFeedback(inputEl) {
+      const parent = inputEl.parentElement;
+      const exist = parent?.querySelector(".feedback");
+      if (exist) exist.remove();
+    }
+  }
+
+  // 전화번호 포맷 (010-1234-5678 형태로 저장)
+  function formatPhone(h1, h2, h3) {
+    const d = `${h1}${h2}${h3}`.replace(/\D/g, "");
+    if (d.length < 10 || d.length > 11) return null;
+    if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+    return `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7)}`;
+  }
+
+  // 최소 항목만 검사
+  function validateForm() {
+    const name = document.getElementById("input_name")?.value.trim();
+    const phonePart1 = document.querySelector("select[name='hphone1']")?.value;
+    const phonePart2 = document.getElementById("input_hp1")?.value.trim();
+    const phonePart3 = document.getElementById("input_hp2")?.value.trim();
+    const agree = document.getElementById("agreeTxt")?.checked;
+
+    if (!name) { alert("이름을 입력하세요."); return false; }
+    if (/[^가-힣a-zA-Z\s]/.test(name)) { alert("이름에는 한글·영문만 입력 가능합니다."); return false; }
+    if (!phonePart1 || !phonePart2 || !phonePart3) { alert("휴대폰 번호를 정확히 입력하세요."); return false; }
+
+    const phone = formatPhone(phonePart1, phonePart2, phonePart3);
+    if (!phone) { alert("휴대폰 번호 형식을 다시 확인해주세요."); return false; }
+
+    if (!agree) { alert("개인정보 수집동의에 체크해주세요."); return false; }
+    return true;
+  }
+
+  // ------ 전송 ------
+  async function submitToFirebase() {
+    if (!validateForm()) return;
+
+    const name = document.getElementById("input_name").value.trim();
+    const phonePart1 = document.querySelector("select[name='hphone1']").value;
+    const phonePart2 = document.getElementById("input_hp1").value.trim();
+    const phonePart3 = document.getElementById("input_hp2").value.trim();
+    const phone = formatPhone(phonePart1, phonePart2, phonePart3);
+
+    const btn = document.querySelector(".btn_area .btn_result");
+    btn?.setAttribute("disabled", "true");
+
+    try {
+      await addDoc(collection(db, "inquiries"), {
+        name,
+        phone,                 // 예: 010-1234-5678
+        createdAt: serverTimestamp(),
+        page: location.href,
+        ua: navigator.userAgent || ""
+      });
+      alert("접수되었습니다! 빠르게 연락드리겠습니다.");
+
+      // 폼 리셋
+      document.getElementById("input_name").value = "";
+      document.getElementById("input_hp1").value = "";
+      document.getElementById("input_hp2").value = "";
+      document.getElementById("agreeTxt").checked = false;
+    } catch (err) {
+      console.error(err);
+      alert("제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      btn?.removeAttribute("disabled");
+    }
+  }
+
+  // 전역 노출 + 입력검사 연결
+  window.submitToFirebase = submitToFirebase;
+  window.addEventListener("DOMContentLoaded", attachInputValidation);
+</script>
 
 
 <body id="top">
-
 
     <!-- preloader
     ================================================== -->
@@ -1151,10 +1320,52 @@
      
     </div> <!-- end modal -->
    
-                    
-</section> <!-- end s-services -->
+   <section id="inquiry" class="s-content target-section" style="padding:6rem 0;">
+      <div class="form_list">
+                    <ul>
+                        <div class="tit">이름</div>
+                        <!-- 이름 -->
+                        <li>
 
+                            <div class="input_area">
+                                <input name="name" type="text" id="input_name" placeholder="이름을 입력하세요">
+                            </div>
+                        </li>
+                        <!-- 휴대폰 -->
+                        <div class="tit">휴대폰</div>
+                        <li>
 
+                            <div class="input_area tel">
+                                <select name="hphone1" id="">
+                                    <option value="010">010</option>
+                                    <option value="011">011</option>
+                                    <option value="016">016</option>
+                                    <option value="017">017</option>
+                                    <option value="018">018</option>
+                                    <option value="019">019</option>
+                                </select>
+                                <input name="hphone2" type="text" id="input_hp1" maxlength="4" placeholder="1234">
+                                <input name="hphone3" type="text" id="input_hp2" maxlength="4" placeholder="5678">
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="agree">
+                    <div class="custom_checkbox">
+                        <input type="checkbox" id="agreeTxt">
+                        <label for="agreeTxt">개인정보 수집동의 <a href="https://digitalartdc.co.kr/?mode=policy"
+                                target="_blank">[보기]</a></label>
+                    </div>
+                </div>
+                <div class="info_txt">* 개인정보 수집동의에 동의하시지 않으면 안내 내용이 제한됩니다.</div>
+                <div class="btn_area">
+                    <!-- <button type="button" class="btn btn_result" disabled>상담신청</button> -->
+                    <button type="button" class="btn btn_result" onclick="submitToFirebase()">상담신청</button>
+                </div>
+
+            </div>
+</section>
 
         <!-- # site-footer
         ================================================== -->
