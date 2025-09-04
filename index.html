@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js" >
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="naver-site-verification" content="53e34301cd35c3b79a38a76484ca51027d15f289" />
+    <meta name="google-site-verification" content="A7Ft6wTCRtVkLQ55XLbZOI43QfLVwJvh4c_-AT4DQXU" />
+    <title>개발하는 디자이너</title>
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- favicons
+    ================================================== -->
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest"> -->
+
+
+</head>
+<style>
+  /* ===== Inquiry (상담신청) ===== */
+  #inquiry {
+    padding: 8rem 1rem;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(0,0,0,.04), transparent 60%),
+      radial-gradient(900px 500px at 90% 110%, rgba(0,0,0,.04), transparent 60%),
+      #fff;
+  }
+
+  .inquiry-wrap {
+    max-width: 450px;
+    margin: 0 auto;
+  }
+
+  .form-card {
+
+
+  }
+
+  .form-head {
+    text-align: center;
+    margin-bottom: 1.75rem;
+  }
+  .form-head h3 {
+    font-size: 35px;
+    margin:0;
+  
+  }
+  .form-head p {
+    margin: 0;
+    color: #6b7280;
+    font-size: .95rem;
+  }
+
+  .form-grid {
+
+
+    gap: 1rem;
+  }
+
+  .input-group label.tit {
+  
+    font-weight: 600;
+    color: hsla(19, 89%, 54%, 1);
+  }
+
+  .input_area {
+    position: relative;
+  }
+
+  /* 공통 인풋 스타일 */
+  .input_area input,
+  .input_area select {
+    width: 100%;
+    height: 48px;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    outline: none;
+    font: inherit;
+ 
+  }
+  .input_area input:focus,
+  .input_area select:focus {
+    border-color: #9ca3af;
+    box-shadow: 0 0 0 4px rgba(2,132,199,.08);
+  }
+  .input_area input::placeholder { color: #9ca3af; }
+
+  /* 전화번호 3분할 그리드 */
+  .input_area.tel {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+    gap: .6rem;
+  }
+
+  /* 개인정보 동의 영역 */
+
+
+  .agreeTxt{
+    margin-top: 30px;
+  }
+  .custom_checkbox {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    color: #374151;
+
+
+  }
+  .custom_checkbox input[type="checkbox"] {
+    margin-top: 15px;
+    width: 18px; 
+    border-radius: 6px;
+    accent-color: #111827;
+  }
+  .custom_checkbox a { color: #2563eb; text-decoration: none; color: #838383; }
+
+  .info_txt {
+    margin-top: .25rem;
+    color: #6b7280;
+    font-size: .85rem;
+  }
+
+  /* 버튼 */
+  .btn_area { margin-top: 1.25rem; }
+  .btn_area .btn_result {
+    width: 100%;
+    height: 60px;
+    border: 0;
+    font-weight: 700;
+    letter-spacing: .2px;
+    cursor: pointer;
+    background: #000;
+    color: #fff;
+    transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+    box-shadow: 0 8px 20px rgba(17,24,39,.15);
+  }
+  .btn_area .btn_result:hover { filter: brightness(1.05); }
+  .btn_area .btn_result:active { transform: translateY(1px); }
+  .btn_area .btn_result[disabled] {
+    opacity: .6; cursor: not-allowed; box-shadow: none;
+  }
+
+  /* 카드 하단의 작고 연한 구분선 느낌 */
+  .form-card::after{
+    content:"";
+    display:block;
+    margin-top: 1.25rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,.06), transparent);
+  }
+
+  /* 반응형 */
+  @media (max-width: 480px){
+    .input_area.tel { grid-template-columns: 1fr 1fr 1fr; }
+  }
+</style>
+
+
+<script>
+  // 페이지 로드 시 폼 초기화 (위의 type="module"에서 window.__initInquiryForm 노출)
+  window.addEventListener('DOMContentLoaded', function(){
+    if (typeof window.__initInquiryForm === 'function') {
+      window.__initInquiryForm();
+    }
+  });
+</script>
+<script type="module">
+  // Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+  // 너의 프로젝트 설정 (현재 페이지에 쓰던 것 그대로)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBclpD0n_8KnYury2JOsC2uaDGO1sbgF0",
+    authDomain: "developer-designer.firebaseapp.com",
+    projectId: "developer-designer",
+    storageBucket: "developer-designer.firebasestorage.app",
+    messagingSenderId: "329935817932",
+    appId: "1:329935817932:web:8982ae8bc61cc070e4c669",
+    measurementId: "G-GRHFW6R8JM"
+  };
+
+  // Init
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
+
+  // ------ 입력 유효성 ------
+  function attachInputValidation() {
+    const nameInput = document.getElementById("input_name");
+    const phoneInput1 = document.getElementById("input_hp1");
+    const phoneInput2 = document.getElementById("input_hp2");
+
+    // 이름: 한글/영문만
+    nameInput?.addEventListener("input", (e) => {
+      const v = e.target.value;
+      if (/[^가-힣a-zA-Z\s]/.test(v)) {
+        showFeedback("이름에는 한글·영문만 입력 가능합니다.", nameInput);
+      } else {
+        clearFeedback(nameInput);
+      }
+    });
+
+    // 번호: 숫자만
+    [phoneInput1, phoneInput2].forEach((el) => {
+      el?.addEventListener("input", (e) => {
+        e.target.value = e.target.value.replace(/\D/g, "");
+        const v = e.target.value;
+        if (/[^0-9]/.test(v)) {
+          showFeedback("휴대폰 번호는 숫자만 입력 가능합니다.", el);
+        } else {
+          clearFeedback(el);
+        }
+      });
+    });
+
+    function showFeedback(message, inputEl) {
+      const parent = inputEl.parentElement;
+      if (!parent) return;
+      const exist = parent.querySelector(".feedback");
+      if (exist) { exist.textContent = message; return; }
+      const p = document.createElement("p");
+      p.className = "feedback";
+      p.style.color = "red";
+      p.style.marginTop = "6px";
+      p.textContent = message;
+      parent.appendChild(p);
+    }
+    function clearFeedback(inputEl) {
+      const parent = inputEl.parentElement;
+      const exist = parent?.querySelector(".feedback");
+      if (exist) exist.remove();
+    }
+  }
+
+  // 전화번호 포맷 (010-1234-5678 형태로 저장)
+  function formatPhone(h1, h2, h3) {
+    const d = `${h1}${h2}${h3}`.replace(/\D/g, "");
+    if (d.length < 10 || d.length > 11) return null;
+    if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+    return `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7)}`;
+  }
+
+  // 최소 항목만 검사
+  function validateForm() {
+    const name = document.getElementById("input_name")?.value.trim();
+    const phonePart1 = document.querySelector("select[name='hphone1']")?.value;
+    const phonePart2 = document.getElementById("input_hp1")?.value.trim();
+    const phonePart3 = document.getElementById("input_hp2")?.value.trim();
+    const agree = document.getElementById("agreeTxt")?.checked;
+
+    if (!name) { alert("이름을 입력하세요."); return false; }
+    if (/[^가-힣a-zA-Z\s]/.test(name)) { alert("이름에는 한글·영문만 입력 가능합니다."); return false; }
+    if (!phonePart1 || !phonePart2 || !phonePart3) { alert("휴대폰 번호를 정확히 입력하세요."); return false; }
+
+    const phone = formatPhone(phonePart1, phonePart2, phonePart3);
+    if (!phone) { alert("휴대폰 번호 형식을 다시 확인해주세요."); return false; }
+
+    if (!agree) { alert("개인정보 수집동의에 체크해주세요."); return false; }
+    return true;
+  }
+
+  // ------ 전송 ------
+  async function submitToFirebase() {
+    if (!validateForm()) return;
+
+    const name = document.getElementById("input_name").value.trim();
+    const phonePart1 = document.querySelector("select[name='hphone1']").value;
+    const phonePart2 = document.getElementById("input_hp1").value.trim();
+    const phonePart3 = document.getElementById("input_hp2").value.trim();
+    const phone = formatPhone(phonePart1, phonePart2, phonePart3);
+
+    const btn = document.querySelector(".btn_area .btn_result");
+    btn?.setAttribute("disabled", "true");
+
+    try {
+      await addDoc(collection(db, "inquiries"), {
+        name,
+        phone,                 // 예: 010-1234-5678
+        createdAt: serverTimestamp(),
+        page: location.href,
+        ua: navigator.userAgent || ""
+      });
+      alert("접수되었습니다! 빠르게 연락드리겠습니다.");
+
+      // 폼 리셋
+      document.getElementById("input_name").value = "";
+      document.getElementById("input_hp1").value = "";
+      document.getElementById("input_hp2").value = "";
+      document.getElementById("agreeTxt").checked = false;
+    } catch (err) {
+      console.error(err);
+      alert("제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      btn?.removeAttribute("disabled");
+    }
+  }
+
+  // 전역 노출 + 입력검사 연결
+  window.submitToFirebase = submitToFirebase;
+  window.addEventListener("DOMContentLoaded", attachInputValidation);
+</script>
+
+
+<body id="top">
+
+    <!-- preloader
+    ================================================== -->
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>
+
+
+    <!-- page wrap
+    ================================================== -->
+    <div id="page" class="s-pagewrap">
+
+
+        <!-- # site header 
+        ================================================== -->
+        <header class="s-header">
+
+            <div class="row s-header__inner">
+
+                <div class="s-header__block">
+                    <div class="s-header__logo">
+                        <a class="logo" href="index.html">
+                            <img src="images/avatars/d_profile.png" alt="Homepage">
+                            <!-- 개발하는<br>디자이너 -->
+                        </a>
+                    </div>
+
+                    <a class="s-header__menu-toggle" href="#0"><span>Menu</span></a>
+                </div> <!-- end s-header__block -->
+
+                <nav class="s-header__nav">
+    
+                    <ul class="s-header__menu-links">
+                        <li class="current"><a href="#intro" class="smoothscroll">Intro</a></li>
+                        <li><a href="#about" class="smoothscroll">About</a></li>
+                        <li><a href="#services" class="smoothscroll">Skill</a></li>
+                        <li><a href="#branding" class="smoothscroll">Branding</a></li>
+                        <li><a href="#businesscard" class="smoothscroll">Business card</a></li>
+                        <li><a href="#logo" class="smoothscroll">Logo</a></li>
+                        <li><a href="#blog" class="smoothscroll">Blog</a></li>
+                        <li><a href="#other" class="smoothscroll">other</a></li>
+                        <li><a href="#footer" class="smoothscroll">Contact</a></li>
+                    </ul> <!-- s-header__menu-links -->
+
+                    <ul class="s-header__social">
+                    
+                      <li>
+                          <a href="">
+                            <!-- <img src="blog.png" alt="blog" style="width: 50px; padding: 2em;"> -->
+
+                              <span class="u-screen-reader-text">Dribbble</span>
+                          </a>
+                      </li>
+                  </ul> <!-- s-header__social -->
+  
+    
+                </nav> <!-- end s-header__nav -->
+
+            </div> <!-- end s-header__inner -->
+
+        </header> <!-- end s-header -->
+
+
+        <!-- # site-content
+        ================================================== -->
+        <section id="content" class="s-content">
+
+
+            <!-- intro
+            ----------------------------------------------- -->
+            <section id="intro" class="s-intro target-section">
+
+                <div class="s-intro__bg"></div>
+
+                <div class="row s-intro__content">
+
+                    <div class="s-intro__content-bg"></div>
+
+                    <div class="column lg-12 s-intro__content-inner">
+                        
+                        <h1 class="s-intro__content-title">
+                        안녕하세요 <br>
+                        개발하는<br/>
+                        디자이너 입니다<br>
+                        </h1>
+
+                       
+                </div> <!-- s-intro__content -->
+
+                <div class="s-intro__scroll-down">
+                    <a href="#about" class="smoothscroll">
+                        <span>Scroll Down</span>
+                    </a>
+                </div> <!-- s-intro__scroll-down -->
+
+            </section> <!-- end s-intro -->
+
+
+            <!-- about
+            ----------------------------------------------- -->
+            <section id="about" class="s-about target-section">
+
+                <div class="row section-header" data-num="">
+                    <h3 class="column lg-12 section-header__pretitle pretitle text-pretitle" style="margin-bottom: 20%;">Who I Am</h3>
+                 
+                    <div class="column lg-12 stack-on-1100 section-header__secondary">
+                        <div class="s-testimonials__author">
+                            <img src="images/avatars/d_pro.png" alt="my image" class="s-testimonials__avatar">
+                            <cite class="s-testimonials__cite">
+                                <strong>개발하는 디자이너</strong>
+                                <span>디자인과 개발을 함께합니다</span>
+                            </cite>
+                        </div>
+                        <p class="desc2">
+                            안녕하세요 개발하는 디자이너 입니다.
+                            저는 웹디자인 국비과정으로 디자인을 시작하여 2년간의 디자인 실무 경력 이후에 이론과 실무 스킬 향상을 위해 국비지원 소프트웨어 개발(7개월) 과정을 수료했습니다. 지금은 웹디자이너로 재직중에 있고, 디자인 업무에 보다 흥미를 가지고 있어, 디자이너를 본업으로 하되 개발 또한 스킬 향상을 위해 끊임없이 공부를 하고 있습니다. 개발하는 디자이너는 자신을 한계에 가두지 않고, 끊임없는 발전을 궁리하는 제 자신을 표현한 브랜드입니다.
+                            <br>
+                            <br>
+"어제의 자신을 조금이라도 극복해 나가는 것, 그것이 무엇보다 중요한 것이다.
+장거리 달리기에서 이길수 있는 상대가 있다면, 그것은 과거의 자신 이니까"
+무라카미 하루키의 
+‘달리기를 말할때 내가 하고싶은 이야기’ 라는 책 구절중 
+가장 좋아하는 부분입니다.
+외부의 성공보다 내면의 만족과 목표달성이 더 큰 가치를 가진다는 말이 많은 공감이 되었습니다.
+어떤 목표를 이루기 위해서는 인내와 지속적인 노력이 필요한 것을알고 , 매일 조금씩 노력하면서 한계치를 끌어올리고 발전 하려고 노력하고 있습니다.
+                        </p>
+                    </div>
+                </div> <!-- end section-header -->
+
+                <div class="row process-list list-block show-ctr block-lg-one-half block-tab-whole">
+    
+                
+                </div> <!-- end process-list -->
+
+            </section> <!-- end s-about -->
+
+
+            <!-- services
+            ----------------------------------------------- -->
+            <section id="services" class="s-services target-section">
+                <div class="row section-header2" data-num="">
+                
+                 
+                    <div class="column lg-12 stack-on-1100 section-header__secondary">
+                        <p class="desc">
+                        </p>
+                        
+                    </div>
+
+
+                    
+                <section class="skills" id="skills">
+               
+                    <h3 class="column lg-12 section-header__pretitle pretitle text-pretitle">Design Skill</h3>
+                   
+                    <div class="skills-container column lg-12" >
+                        
+                      <div class="skill-container">
+                        <p>Illustrator</p>
+                        <div class="percentage illustrator-percentage">80%</div>
+                        <div class="bar">
+                          <span class="illustrator"></span>
+                        </div>
+                      </div>
+              
+                      <div class="skill-container">
+                        <p>Photoshop</p>
+                        <div class="percentage photoshop-percentage">80%</div>
+                        <div class="bar">
+                          <span class="photoshop"></span>
+                        </div>
+                      </div>
+              
+                      <div class="skill-container">
+                        <p>InDesign</p>
+                        <div class="percentage inDesign-percentage">50%</div>
+                        <div class="bar">
+                          <span class="inDesign"></span>
+                        </div>
+                      </div>
+              
+                      <div class="skill-container">
+                        <p>Premiere Pro</p>
+                        <div class="percentage premiere-percentage">50%</div>
+                        <div class="bar">
+                          <span class="premiere"></span>
+                        </div>
+                      </div>
+              
+                      <div class="skill-container">
+                        <p>Html/Css</p>
+                        <div class="percentage mark-percentage">50%</div>
+                        <div class="bar">
+                          <span class="mark"></span>
+                        </div>
+                      </div>
+
+                      
+                      <div class="skill-container">
+                        <p>Figma</p>
+                        <div class="percentage figma-percentage">30%</div>
+                        <div class="bar">
+                          <span class="figma"></span>
+                        </div>
+                      </div>
+                      <h3 class="column lg-12 section-header__pretitle pretitle text-pretitle" style="margin-top: 100px; text-align: right;">Licence</h3>
+                      <div class="skill-container" style="text-align: right; margin-right: 5%;">
+                        
+                          컴퓨터그래픽스 운용기능사<br>
+                          웹디자인기능사<br>
+                          QTQ 포토샵 1급<br>
+                          QTQi 일러스트 1급<br>
+                          QTQid 인디자인 1급<br>
+                       
+      
+                   </div>
+                   
+                    </div>
+                
+                </section>
+               
+         </div>
+         
+            </section> <!-- end s-services -->
+
+
+            <!-- portfolio
+            ----------------------------------------------- -->
+            <section id="branding" class="s-folio target-section">
+
+                <div class="row section-header light-on-dark" data-num="">
+                    <h3 class="column lg-12 section-header__pretitle text-pretitle">WORK</h3>
+                    <div class="column lg-6 stack-on-1100 section-header__primary">
+                        <h2 class="title text-display-1">
+                        Hear,Me Coffee <br> Branding
+                        </h2>
+                    </div>
+                    <div class="column lg-6 stack-on-1100 section-header__secondary">
+                        <p class="desc">
+                        나라는 존재를 본인만의 방식으로 나타내고 그 개성을 브랜드화 하는
+                        것이 트렌드가 되는 요즘 MZ 세대를 모티브로 나 자신에 대해 듣고
+                        내가 여기있다는 두가지 의미를 가진 HEAR,ME 커피는 히얼미 에서
+                        만 즐길 수 있는 독창적인 메뉴들을 가지고 소비자에게 새로운 음료와
+                        공간으로 트렌드를 제안하는 커피 프랜차이즈를 목표로 합니다.
+                        </p>
+                    </div>
+                </div> <!-- end section-header -->
+
+                <div id="bricks" class="row bricks">
+                    <div class="column lg-12 masonry">
+                        <div class="bricks-wrapper">
+
+                            <div class="grid-sizer"></div>
+
+                            <article class="brick brick--double entry">
+                                <a href="#modal-01" class="entry__link">
+                                    <div class="entry__thumb">
+                                        <img src="images/folio/hearme.png" alt="">
+                                    </div>
+                                    <div class="entry__info">
+                                        <div class="entry__cat">히얼미 커피</div>
+                                        <h4 class="entry__title">로고 디자인</h4>
+                                    </div>
+                                </a>
+                            </article> <!-- entry -->
+
+                            <article class="brick brick--double entry">
+                                <a href="#modal-02" class="entry__link"  onclick="resetSlideIndex()">
+                                    <div class="entry__thumb">
+                                        <img src="images/folio/poster2.png" alt="">
+                                    </div>
+                                    <div class="entry__info">
+                                        <div class="entry__cat">히얼미 커피</div>
+                                        <h4 class="entry__title">포스터 디자인</h4>
+                                    </div>
+                                </a>
+                            </article> <!-- entry -->
+
+                            <article class="brick entry">
+                                <a href="#modal-03" class="entry__link">
+                                    <div class="entry__thumb">
+                                        <img src="images/folio/sign.png" alt="">
+                                    </div>
+                                    <div class="entry__info">
+                                        <div class="entry__cat">히얼미 커피</div>
+                                        <h4 class="entry__title">사인 디자인</h4>
+                                    </div>
+                                </a>
+                            </article> <!-- entry -->
+
+                            <article class="brick entry">
+                                <a href="#modal-04" class="entry__link">
+                                    <div class="entry__thumb">
+                                        <img src="images/folio/banner.jpg" alt="">
+                                    </div>
+                                    <div class="entry__info">
+                                        <div class="entry__cat">히얼미 커피</div>
+                                        <h4 class="entry__title">메뉴판 및 배너</h4>
+                                    </div>
+                                </a>
+                            </article> <!-- entry -->
+
+                            <article class="brick entry">
+                                <a href="#modal-05" class="entry__link">
+                                    <div class="entry__thumb">
+                                        <img src="images/folio/md.png" alt="">
+                                    </div>
+                                    <div class="entry__info">
+                                        <div class="entry__cat">히얼미 커피</div>
+                                        <h4 class="entry__title">MD 상품</h4>
+                                    </div>
+                                </a>
+                            </article> <!-- entry -->
+
+                            <article class="brick entry">
+                                <a href="#modal-06" class="entry__link">
+                                    <div class="entry__thumb">
+                                        <img src="images/folio/Character.png" alt="">
+                                    </div>
+                                    <div class="entry__info">
+                                        <div class="entry__cat">히얼미커피</div>
+                                        <h4 class="entry__title">캐릭터 디자인</h4>
+                                    </div>
+                                </a>
+                            </article> <!-- entry -->
+
+                        </div> <!-- end bricks-wrapper -->
+                    </div> <!-- end masonry -->
+                </div> <!-- end bricks -->
+
+                <!-- modal templates popup
+                -------------------------------------------- -->
+                <div id="modal-01" hidden>
+                    <div class="modal-popup">
+                        <img src="images/folio/gallery/LogoDesign.png" alt="">
+            
+                        <div class="modal-popup__desc">
+                            <h5>Hear,Me</h5>
+                            <p>나라는 존재를 본인만의 방식으로 나타내고 그 개성을 브랜드화 하는것이 트렌드가 되는 요즘 MZ 세대를 모티브로 나 자신에 대해 듣고, 내가 여기있다는 두가지 의미를 가진 HEAR,ME 커피는 히얼미 에서만 즐길 수 있는 독창적인 메뉴들을 가지고 소비자 에게 새로운 음료와 공간으로 트렌드를 제안하는 커피 프랜차이즈를 목표로 합니다.
+                            </p>
+                            <ul class="modal-popup__cat">
+                                <!-- <li>UX Research</li> -->
+                                <li>Brand Identity</li>
+                            </ul>
+                        </div>
+            
+                        
+                    </div>
+                </div> 
+                <div id="modal-02" hidden>
+                    <div class="modal-popup">
+                        <div class="slideshow-container">
+                            <img class="mySlides" src="images/folio/gallery/cafePoster3.jpg" alt="">
+                            <img class="mySlides" src="images/folio/gallery/PosterDesign.png" alt="">
+                            
+                            <!-- 추가 이미지 -->
+                            <img class="mySlides" src="images/folio/gallery/cafePoster.jpg" alt="">
+                            <!-- 추가 이미지 -->
+                            <img class="mySlides" src="images/folio/gallery/poster_desc.png" alt="">
+                            <!-- 추가 이미지 -->
+                                            
+                            <!-- 이전 이미지로 이동하는 화살표 -->
+                            <!-- <a class="prev" onclick="prevSlide()" > -->
+                            
+                            <!-- </a> -->
+                    
+
+                            <div class="slider__btn">
+                                <a href="#branding" class="prev" role="button" onclick="prevSlide()" aria-label="왼쪽 이미지">prev</a>
+                                <a href="#branding" class="next" role="button" aria-label="오른쪽 이미지" onclick="nextSlide()">next</a>
+                            </div>
+                        </div>
+                                    
+                        <div class="modal-popup__desc">
+                            <h5>Poster Design</h5>
+                            <p>매장안과 밖의 인테리어 요소와 홍보형 포스터 제작<br>
+                            size : 297*420(mm)</p>
+                            <ul class="modal-popup__cat">
+                                <li>Poster Design</li>
+                            </ul>
+                        </div>
+                                    
+                        <a href="https://blog.naver.com/PostView.naver?blogId=u0_20&logNo=223370920713&categoryNo=26&parentCategoryNo=&from=thumbnailList" class="modal-popup__details">Project link</a>
+                    </div>
+                </div>
+                
+
+                <div id="modal-03" hidden>
+                    <div class="modal-popup">
+                        <div class="slideshow-container">
+                            <img class="mySlides" src="images/folio/gallery/MainSign.png" alt="">
+                            <img class="mySlides" src="images/folio/gallery/sheet.png" alt="">
+                            <img class="mySlides" src="images/folio/gallery/sheet2.png" alt="">
+                            <img class="mySlides" src="images/folio/gallery/doorsheet.jpg" alt="">
+                            
+                       
+                                            
+        
+                            <div class="slider__btn">
+                                <a href="#work" class="prev" role="button" aria-label="왼쪽 이미지"  onclick="prevSlide()">prev</a>
+                                <a href="#work" class="next" role="button" aria-label="오른쪽 이미지" onclick="nextSlide()">next</a>
+                            </div>
+                        
+                        </div>
+                        <div class="modal-popup__desc">
+                            <h5>Sign Design</h5>
+                            <p>메인간판 및 앞/뒤 시트지 디자인</p>
+                            <ul class="modal-popup__cat">
+                                <li>Sign Design</li>
+                            </ul>
+                        </div>
+            
+                        <!-- <a href="" class="modal-popup__details">자세히 보기</a> -->
+                    </div>
+                </div> <!-- end modal -->
+
+                <div id="modal-04" hidden>
+                    <div class="modal-popup">
+                        <div class="slideshow-container">
+                            <img class="mySlides" src="images/folio/gallery/menu1.jpg" alt="메뉴1">
+                            <img class="mySlides" src="images/folio/gallery/menu2.jpg" alt="메뉴2">
+                            <img class="mySlides" src="images/folio/gallery/banner_.jpg" alt="배너">
+                       
+                            
+                
+                                            
+        
+                            <div class="slider__btn">
+                                <a href="#work" class="prev" role="button" aria-label="왼쪽 이미지"  onclick="prevSlide()">prev</a>
+                                <a href="#work" class="next" role="button" aria-label="오른쪽 이미지" onclick="nextSlide()">next</a>
+                            </div>
+                        
+                        </div>
+                        <div class="modal-popup__desc">
+                            <h5>Menu Board Design</h5>
+                            <p>매장 배치용/전자메뉴판용으로 제작<br>
+                           Size : 971*565(mm/did용) 297*210(mm/카운터 진열용) 600*1800(mm/x배너)
+                            </p>
+                            <ul class="modal-popup__cat">
+                                <li>Editorial Design</li>
+                            </ul>
+                        </div>
+            
+                        <!-- <a href="" class="modal-popup__details">자세히 보기</a> -->
+                    </div>
+                </div> <!-- end modal -->
+
+                <div id="modal-05" hidden>
+                    <div class="modal-popup">
+
+                        <img src="images/folio/gallery/mdp.png" alt="">
+            
+                        <div class="modal-popup__desc">
+                            <h5>Md상품</h5>
+                            <p>스티커 | 스마트톡 | 컵 인쇄 | 코스터 | 비품 등 제작 경험</p>
+                            <ul class="modal-popup__cat">
+                                <li>MD Product</li>
+                            </ul>
+                        </div>
+            
+                        <a href="https://blog.naver.com/u0_20/223370983452" class="modal-popup__details">자세히 보기</a>
+                    </div>
+                </div> <!-- end modal -->
+
+                <div id="modal-06" hidden>
+                    <div class="modal-popup">
+                        <img src="images/folio/gallery/character_.png" alt="">
+            
+                        <div class="modal-popup__desc">
+                            <h5>Character Design</h5>
+                            <p>이벤트용 MD상품 제작을 위한 캐릭터 디자인</p>
+                            <ul class="modal-popup__cat">
+                                <li>Character Design</li>
+                            </ul>
+                        </div>
+        
+                    </div>
+                    
+                </div> <!-- end modal -->
+
+            </section> <!-- end s-folio -->
+
+       
+
+            <section id="businesscard" class="s-testimonials target-section">
+
+                <div class="row s-testimonials__content">
+                    <div class="column lg-12">
+        
+                        <div class="swiper-container s-testimonials__slider">
+        
+                            <div class="swiper-wrapper">
+
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/shinsung.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>신성산업</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    
+                                        <img src="images/folio/shinsung.jpg" alt="">
+                                
+                                    
+                                </div> <!-- end s-testimonials__slide -->
+
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/woolim.jpg" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>울림 디자인 인테리어 스페이스 </strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    
+                                        <img src="images/folio/gallery/woolim.jpg" alt="">
+                                
+                                    
+                                </div> <!-- end s-testimonials__slide -->
+
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/d_pro.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>개발하는 디자이너</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    
+                                        <img src="images/folio/my.png" alt="">
+                                
+                                    
+                                </div> <!-- end s-testimonials__slide -->
+
+
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/folio/gallery/hiplanerL.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>현대해상 하이플래너</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    
+                                        <img src="images/folio/hiplan.png" alt="">
+                                
+                                    
+                                </div> <!-- end s-testimonials__slide -->
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/folio/merLogo.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>메르포토</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    
+                                        <img src="images/folio/mer_b.png" alt="">
+                                
+                                    
+                                </div> <!-- end s-testimonials__slide -->
+
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/folio/wtb.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>우타로바</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    
+                                        <img src="images/folio/gallery/wootaro.png" alt="">
+                                
+                                    
+                                </div> <!-- end s-testimonials__slide -->
+
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/hearme.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>히얼미 커피</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    
+                                        <img src="images/folio/gallery/s_hearme.png" alt="">
+                                
+                                    
+                                </div> <!-- end s-testimonials__slide -->
+                
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/folio/theFront.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>(주)더프론트</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                                        <img src="images/folio/gallery/s_thef.png" alt="더프론트명함">
+                                    </p>
+                                </div> <!-- end s-testimonials__slide -->
+                
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/p_dev.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>developer</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                                        <img src="images/folio/gallery/s_dev.png" alt="개발자명하">
+                                    </p>
+                                </div> <!-- end s-testimonials__slide -->
+        
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/p_beaty.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>beaty</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                                        <img src="images/folio/gallery/s_beat.png" alt="">
+                                    </p>
+                                </div> <!-- end s-testimonials__slide -->
+                          
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/p_barun.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>바른 공인중개사</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                                        <img src="images/folio/gallery/s_bar.png" alt="">
+                                    </p>
+                                </div> <!-- end s-testimonials__slide -->
+    
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/p_pic.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>pico</strong>
+                                            <span>명함 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                                        <img src="images/folio/gallery/s_pic.png" alt="">
+                                    </p>
+                                </div> <!-- end s-testimonials__slide -->
+    
+                            </div> <!-- end swiper-wrapper -->
+        
+                            <div class="swiper-pagination"></div>
+        
+                        </div> <!-- end swiper-container -->
+        
+                    </div> <!-- end column -->
+                </div> <!-- end s-testimonials__content -->
+    
+            </section> <!-- end testimonials -->
+    
+        </section>  <!-- end content -->
+
+            <!-- services
+            ----------------------------------------------- -->
+          
+
+           
+                <section id="logo" class="s-folio target-section">
+
+                    <div class="row section-header light-on-dark" data-num="">
+                        <h3 class="column lg-12 section-header__pretitle text-pretitle">Work</h3>
+                        <div class="column lg stack-on-1100 section-header__primary">
+                            <h2 class="title text-display-1">
+                            Logo Design
+                            </h2>
+                            <p class="desc">
+                            로고 디자인
+                                </p>
+                        </div>
+                      
+                    </div> <!-- end section-header -->
+    
+                    <div id="bricks" class="row bricks">
+                        <div class="column lg-12 masonry">
+                            <div class="bricks-wrapper">
+                                <article class="brick brick--double entry">
+                                    <a href="#modal-09" class="entry__link"  onclick="resetSlideIndex()">
+                                        <div class="entry__thumb">
+                                            <img src="images/folio/gallery/minsnail.png" alt="">
+                                        </div>
+                                        <div class="entry__info">
+                                            <div class="entry__cat">민달팽이 여행결산</div>
+                                            <h4 class="entry__title">로고 디자인</h4>
+                                        </div>
+                                    </a>
+                                </article> <!-- entry -->
+    
+                                <article class="brick brick--double entry">
+                                    <a href="#modal-07" class="entry__link">
+                                        <div class="entry__thumb">
+                                            <img src="images/folio/merLogo.png" alt="">
+                                        </div>
+                                        <div class="entry__info">
+                                            <div class="entry__cat">메르포토</div>
+                                            <h4 class="entry__title">로고 디자인</h4>
+                                        </div>
+                                    </a>
+                                </article> <!-- entry -->
+    
+                                <article class="brick brick--double entry">
+                                    <a href="#modal-08" class="entry__link"  onclick="resetSlideIndex()">
+                                        <div class="entry__thumb">
+                                            <img src="images/folio/theFront.png" alt="">
+                                        </div>
+                                        <div class="entry__info">
+                                            <div class="entry__cat">더프론트</div>
+                                            <h4 class="entry__title">로고 디자인</h4>
+                                        </div>
+                                    </a>
+                                </article> <!-- entry -->
+    
+                                <article class="brick brick--double entry">
+                                    <a href="#modal-10" class="entry__link"  onclick="resetSlideIndex()">
+                                        <div class="entry__thumb">
+                                            <img src="images/folio/wtb.png" alt="">
+                                        </div>
+                                        <div class="entry__info">
+                                            <div class="entry__cat">우타로바</div>
+                                            <h4 class="entry__title">로고 디자인</h4>
+                                        </div>
+                                    </a>
+                                </article> <!-- entry -->
+    
+                                <article class="brick brick--double entry">
+                                    <a href="#modal-11" class="entry__link"  onclick="resetSlideIndex()">
+                                        <div class="entry__thumb">
+                                            <img src="images/folio/donkka.png" alt="">
+                                        </div>
+                                        <div class="entry__info">
+                                            <div class="entry__cat">공룡돈까스</div>
+                                            <h4 class="entry__title">로고/간판 디자인</h4>
+                                        </div>
+                                    </a>
+                                </article> <!-- entry -->
+
+                                <article class="brick brick--double entry">
+                                    <a href="#modal-12" class="entry__link"  onclick="resetSlideIndex()">
+                                        <div class="entry__thumb">
+                                            <img src="images/folio/coffee.jpg" alt="">
+                                        </div>
+                                        <div class="entry__info">
+                                            <div class="entry__cat">공룡커피</div>
+                                            <h4 class="entry__title">로고 디자인</h4>
+                                        </div>
+                                    </a>
+                                </article> <!-- entry -->
+
+                                <article class="brick brick--double entry">
+                                    <a href="#modal-13" class="entry__link"  onclick="resetSlideIndex()">
+                                        <div class="entry__thumb">
+                                            <img src="images/folio/Limandi.jpg" alt="">
+                                        </div>
+                                        <div class="entry__info">
+                                            <div class="entry__cat">임앤아이힐링농장</div>
+                                            <h4 class="entry__title">로고 디자인</h4>
+                                        </div>
+                                    </a>
+                                </article> <!-- entry -->
+
+
+                            </div> <!-- end bricks-wrapper -->
+                        </div> <!-- end masonry -->
+                    </div> <!-- end bricks -->
+                    <div id="modal-07" hidden>
+                        <div class="modal-popup">
+                            <img src="images/folio/merex2.png" alt="">
+                
+                            <div class="modal-popup__desc">
+                                <h5>Merphoto</h5>
+                                <p>진정성 있는 사진을 담고 여행의 순간들을 기록하는 
+                                    바다를 사랑하는 대표님의 마음을 담아
+                                    프랑스어로 바다의 뜻을 가진 메르(Mer)
+                                    라는 단어를 사용해 제작 했습니다.   
+                                </p>
+                                <ul class="modal-popup__cat">
+                                    <!-- <li>UX Research</li> -->
+                                    <li>Brand Identity</li>
+                                </ul>
+                            </div>
+                
+                            <a href="https://blog.naver.com/PostView.naver?blogId=u0_20&Redirect=View&logNo=223396382522&categoryNo=27&isAfterWrite=true&isAfterUpdateOnly=true" class="modal-popup__details">Project link</a>
+                        </div>
+                    </div> <!-- end modal -->
+                    <div id="modal-08" hidden>
+                        <div class="modal-popup">
+                            <div class="slideshow-container">
+                                <img class="mySlides" src="images/folio/gallery/thefront1.png" alt="">
+                                <img class="mySlides" src="images/folio/gallery/thefront1_2.png" alt="">
+                            
+                                
+                           
+                                                
+            
+                                <div class="slider__btn">
+                                    <a href="#logo" class="prev" role="button" aria-label="왼쪽 이미지"  onclick="prevSlide()">prev</a>
+                                    <a href="#logo" class="next" role="button" aria-label="오른쪽 이미지" onclick="nextSlide()">next</a>
+                                </div>
+                            
+                            </div>
+                            <div class="modal-popup__desc">
+                                <h5>더프론트 주식회사</h5>
+                                <p>로고 및 출력물 제작</p>
+                                <ul class="modal-popup__cat">
+                                    <li>The Front</li>
+                                </ul>
+                            </div>
+                
+                            <!-- <a href="" class="modal-popup__details">자세히 보기</a> -->
+                        </div>
+                    </div> <!-- end modal -->
+                    <div id="modal-09" hidden>
+                        <div class="modal-popup">
+                            
+                                <img class="mySlides" src="images/folio/gallery/min.png" alt="">
+                              
+                            
+                            <div class="modal-popup__desc">
+                                <h5>민달팽이 여행결산</h5>
+                                <p>로고디자인</p>
+                                <ul class="modal-popup__cat">
+                                    <li>Logo Design</li>
+                                </ul>
+                            </div>
+                
+                            <!-- <a href="" class="modal-popup__details">자세히 보기</a> -->
+                        </div>
+                    </div> <!-- end modal -->
+                    <div id="modal-10" hidden>
+                        <div class="modal-popup">
+                            <div class="slideshow-container">
+                                <img class="mySlides" src="images/folio/gallery/wootaro.png" alt="">
+                                <img class="mySlides" src="images/folio/gallery/wtbS.png" alt="">
+                   
+                                <div class="slider__btn">
+                                    <a href="#logo" class="prev" role="button" aria-label="왼쪽 이미지"  onclick="prevSlide()">prev</a>
+                                    <a href="#logo" class="next" role="button" aria-label="오른쪽 이미지" onclick="nextSlide()">next</a>
+                                </div>
+                            
+                            </div>
+                            <div class="modal-popup__desc">
+                                <h5>Woo Tarot Bar</h5>
+                                <p>로고 및 시트지/명함디자인</p>
+                                <ul class="modal-popup__cat">
+                                    <li>Woo Tarot Bar</li>
+                                </ul>
+                            </div>
+                
+                            <!-- <a href="" class="modal-popup__details">자세히 보기</a> -->
+                        </div>
+                    </div> <!-- end modal -->
+                    <!-- 공룡돈까스 -->
+                    <div id="modal-11" hidden>
+                        <div class="modal-popup">
+                            <div class="slideshow-container">
+                                <img class="mySlides" src="images/folio/donkka_S.png" alt="">
+                                <img class="mySlides" src="images/folio/donkka_S2.png" alt="">
+                          
+                                <div class="slider__btn">
+                                    <a href="#logo" class="prev" role="button" aria-label="왼쪽 이미지"  onclick="prevSlide()">prev</a>
+                                    <a href="#logo" class="next" role="button" aria-label="오른쪽 이미지" onclick="nextSlide()">next</a>
+                                </div>
+                            
+                            </div>
+                        
+           
+                            <div class="modal-popup__desc">
+                                <h5>공룡돈까스</h5>
+                                <p>로고 및 간판디자인</p>
+                                <ul class="modal-popup__cat">
+                                    <li>공룡돈까스</li>
+                                </ul>
+                            </div>
+                
+                            <!-- <a href="" class="modal-popup__details">자세히 보기</a> -->
+                        </div>
+                    </div> <!-- end modal -->
+
+                             <!-- 공룡커피 -->
+                             <div id="modal-12" hidden>
+                                <div class="modal-popup">
+                                    <div class="slideshow-container">
+                                        <img class="mySlides" src="images/folio/coffeeS.jpg" alt="">
+                                 
+                                
+                                    
+                                    </div>
+                                
+                   
+                                    <div class="modal-popup__desc">
+                                        <h5>공룡커피</h5>
+                                        <p>로고 디자인</p>
+                                        <ul class="modal-popup__cat">
+                                            <li>공룡커피</li>
+                                        </ul>
+                                    </div>
+                        
+                                    <!-- <a href="" class="modal-popup__details">자세히 보기</a> -->
+                                </div>
+                            </div> <!-- end modal -->
+
+                                
+                             <!-- 임앤아이  -->
+                             <div id="modal-13" hidden>
+                                <div class="modal-popup">
+                                    <div class="slideshow-container">
+                                        <img class="mySlides" src="images/folio/limandI_s.jpg" alt="">
+                                 
+                                
+                                    
+                                    </div>
+                                
+                   
+                                    <div class="modal-popup__desc">
+                                        <h5>임앤아이힐링농장</h5>
+                                        <p>로고 디자인</p>
+                                        <ul class="modal-popup__cat">
+                                            <li>로고 / 명함디자인</li>
+                                        </ul>
+                                    </div>
+                        
+                                    <!-- <a href="" class="modal-popup__details">자세히 보기</a> -->
+                                </div>
+                            </div> <!-- end modal -->
+
+                                    
+            </section> <!-- end s-services -->
+
+
+
+<!-- 전체 페이지 슬라이드 -->
+
+<!-- 전체페이지 슬라이드 닫힘 -->
+
+            <!-- testimonials
+            ----------------------------------------------- -->
+            <section id="blog" class="s-testimonials">
+
+                <div class="row s-testimonials__content">
+                    <div class="column lg-12">
+        
+                        <div class="swiper-container s-testimonials__slider">
+        
+                            <div class="swiper-wrapper">
+
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/toryp.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>토리아트 센터</strong>
+                                            <span>블로그 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                        
+                                        <img src="images/folio/gallery/tory.png" alt="">
+                                
+                                </p>
+                                </div> <!-- end s-testimonials__slide -->
+                
+    
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/merprofile.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>메르포토</strong>
+                                            <span>블로그 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                        
+                                        <img src="images/folio/gallery/m_blog.png" alt="">
+                                
+                                </p>
+                                </div> <!-- end s-testimonials__slide -->
+                
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/d_pro.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>개발하는 디자이너</strong>
+                                            <span>블로그 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                                      <img src="images/folio/gallery/d_blog.png" alt="">
+                                    </p>
+                                </div> <!-- end s-testimonials__slide -->
+                
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/p_udam.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>유담이네 육아일기</strong>
+                                            <span>블로그 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                                        <img src="images/folio/gallery/udam.png" alt="">
+                                      </p>
+                                </div> <!-- end s-testimonials__slide -->
+        
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/p_dd.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>ddulgi</strong>
+                                            <span>블로그 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                                        <img src="images/folio/gallery/b_ddu.png" alt="">
+                                      </p>
+                                </div> <!-- end s-testimonials__slide -->
+            
+                                <div class="s-testimonials__slide swiper-slide">
+                                    <div class="s-testimonials__author">
+                                        <img src="images/avatars/p_man.png" alt="Author image" class="s-testimonials__avatar">
+                                        <cite class="s-testimonials__cite">
+                                            <strong>만개의 레시피 리디자인</strong>
+                                            <span>블로그 디자인</span>
+                                        </cite>
+                                    </div>
+                                    <p>
+                                        <img src="images/folio/gallery/b_man.png" alt="">
+                                      </p>
+                                </div> <!-- end s-testimonials__slide -->
+
+                            </div> <!-- end swiper-wrapper -->
+        
+                            <div class="swiper-pagination"></div>
+        
+                        </div> <!-- end swiper-container -->
+        
+                    </div> <!-- end column -->
+                </div> <!-- end s-testimonials__content -->
+
+            </section> <!-- end testimonials -->
+
+        </section>  <!-- end content -->
+
+      
+
+<!-- 기타디자인 -->
+
+<section id="other" class="s-folio2 target-section">
+
+    <div class="row section-header light-on-dark" data-num="">
+        <h3 class="column lg-12 section-header__pretitle text-pretitle">other Works</h3>
+        <div class="column lg stack-on-1100 section-header__primary">
+            <h2 class="title text-display-1">
+        
+            </h2>
+           
+        </div>
+      
+    </div> <!-- end section-header -->
+
+    <div id="bricks" class="row bricks">
+        <div class="column lg-12 masonry">
+            <div class="bricks-wrapper">
+
+                <article class="brick2 brick--double entry">
+                    <div class="entry__link2">
+                        <div class="entry__thumb">
+                            <img src="images/folio/gundam.png" alt="">
+                        </div>
+                        <div class="entry__info">
+                            <div class="entry__cat">건담베이스</div>
+                            <h4 class="entry__title">POP디자인</h4>
+                        </div>
+                    </div>
+                </article> <!-- entry -->
+               
+                <article class="brick2 brick--double entry">
+                    <div class="entry__link2">
+                        <div class="entry__thumb">
+                            <img src="images/folio/wabbler.png" alt="">
+                        </div>
+                        <div class="entry__info">
+                            <div class="entry__cat">건담베이스</div>
+                            <h4 class="entry__title">와블러 디자인</h4>
+                        </div>
+                    </div>
+                </article> <!-- entry -->
+                <article class="brick2 brick--double entry">
+                    <div class="entry__link2">
+                        <div class="entry__thumb">
+                            <img src="images/folio/flex.png" alt="">
+                        </div>
+                        <div class="entry__info">
+                            <div class="entry__cat">이벤트 프로모션</div>
+                            <h4 class="entry__title">개인 작업물</h4>
+                        </div>
+                    </div>
+                </article> <!-- entry -->
+               
+
+
+            </div> <!-- end bricks-wrapper -->
+            
+        </div> <!-- end masonry -->
+    </div> <!-- end bricks -->
+    <div id="modal-20" >
+     
+    </div> <!-- end modal -->
+<section id="inquiry" class="s-content target-section">
+  <div class="inquiry-wrap">
+    <div class="form-card">
+      <div class="form-head">
+      <h2 class="title text-display-1">
+                       Contact
+                            </h2>
+      
+      </div>
+
+      <div class="form-grid">
+        <!-- 이름 -->
+        <div class="input-group">
+          <label class="tit" for="input_name">
+          </label>
+          <div class="input_area">
+            <input name="name" type="text" id="input_name" placeholder="이름을 입력하세요">
+          </div>
+        </div>
+
+        <!-- 휴대폰 -->
+        <div class="input-group">
+          <label class="tit" for="input_hp1"></label>
+          <div class="input_area tel">
+            <select name="hphone1" aria-label="통신사 국번 선택">
+              <option value="010">010</option>
+              <option value="011">011</option>
+              <option value="016">016</option>
+              <option value="017">017</option>
+              <option value="018">018</option>
+              <option value="019">019</option>
+            </select>
+            <input name="hphone2" type="text" id="input_hp1" maxlength="4" placeholder="1234">
+            <input name="hphone3" type="text" id="input_hp2" maxlength="4" placeholder="5678">
+          </div>
+        </div>
+
+        <!-- 동의/안내/버튼 -->
+        <div class="agree">
+          <div class="custom_checkbox">
+            <input type="checkbox" id="agreeTxt">
+            <label for="agreeTxt">  개인정보 수집동의 <a href="https://digitalartdc.co.kr/?mode=policy" target="_blank" rel="noopener">[보기]</a></label>
+          </div>
+          <div class="info_txt">* 동의하지 않으면 안내 내용이 제한됩니다.</div>
+        </div>
+
+        <div class="btn_area">
+          <button type="button" class="btn btn_result" onclick="submitToFirebase()">상담신청</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+        <!-- # site-footer
+        ================================================== -->
+        <footer id="footer" class="s-footer target-section">
+
+            <div class="row section-header">
+                <h3 class="column lg-12 section-header__pretitle text-pretitle">Get In Touch</h3>
+                <div class="column lg-6 stack-on-1100 section-header__primary">
+                    <h2 class="title text-display-1">
+                  <!-- Contact <br> -->
+                   <a href="mailto:sonyuyoung@naver.com" title="">Please Click</a>
+                    </h2>
+                </div>    
+                <div class="column lg-6 stack-on-1100 section-header__secondary">
+                    
+             
+
+                    <div class="contact-block">
+                        <h6>Contact Infos</h6>
+                        <ul class="contact-list">
+                            <li>  <a href="https://link.inpock.co.kr/develop_designs">카카오채널 </a></li>
+                            <li> <a href="mailto:sonyuyoung@naver.com">Email : sonyuyoung@naver.com</a></li>
+                            
+                            <li><a href="tel:+821047332048">Phone : 01047332048</a></li>
+                            <li><a href="https://blog.naver.com/u0_20">Blog : 개발하는 디자이너</a></li>
+                            <li><a href="https://github.com/sonyuyoung">Github</a></li>
+                            <li><a href="https://u020.notion.site/Portfolio-1fb480d358de4107b1934c5ad1d7a296">개발 포트폴리오</a></li>
+                        </ul>
+
+                        
+                    </div>
+
+                </div>
+            </div> <!-- end section-header -->
+
+            <div class="row list-block block-lg-one-half block-tab-whole block-stack-on-1000 s-footer__btns">
+                <div class="column list-block__item">
+                    <div class="s-footer__contact-btn">
+                        <a href="tel:+821047332048" class="btn btn--primary u-fullwidth">
+                            Let's Talk 
+                        </a>
+                    </div>
+                </div>
+                
+            </div> <!-- end s-footer__btns -->
+
+            <div class="row s-footer__bottom">
+
+                <div class="column lg-6 tab-12 s-footer__bottom-right">
+                    <div class="ss-copyright">
+                        <span>© Copyright sonyuyoung 2024</span> 
+                        <span>Design by sonyuyoung</span>
+                    </div>
+                </div>
+
+            </div> <!-- s-footer__bottom -->
+    
+          
+        </footer> <!-- end footer -->
+
+
+    <!-- Java Script
+    ================================================== -->
+    <script src="js/plugins.js"></script>
+    <script src="js/main.js"> </script>
+    <script src="js/slide.js"></script>
+
+
+</body>
+</html>
