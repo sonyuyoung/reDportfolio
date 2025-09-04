@@ -1,42 +1,44 @@
 /* ===================================================================
- * Mueller 1.0.0 - Main JS
- *
- * ------------------------------------------------------------------- */
-
+ * Mueller 1.0.0 - Main JS (safe version)
+ * --------------------------------------------------------------- */
 (function (html) {
   "use strict";
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      spans.forEach((span, index) => {
-        const percentage = percentages[index];
+  /* ---------- Skills: observer & percentage position ---------- */
+  const spans = document.querySelectorAll(".bar span");
+  const percentages = document.querySelectorAll(".percentage");
+  const skillContainer = document.querySelector(".skills-container");
+
+  if (skillContainer && (spans.length || percentages.length)) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!spans.length && !percentages.length) return;
         if (entry.isIntersecting) {
-          span.classList.add("animate");
-          percentage.classList.add("animate");
+          spans.forEach((s) => s.classList.add("animate"));
+          percentages.forEach((p) => p.classList.add("animate"));
         } else {
-          span.classList.remove("animate");
-          percentage.classList.remove("animate");
+          spans.forEach((s) => s.classList.remove("animate"));
+          percentages.forEach((p) => p.classList.remove("animate"));
         }
       });
     });
-  });
-
-  const skillContainer = document.querySelector(".skills-container");
-  const spans = document.querySelectorAll(".bar span");
-  const percentages = document.querySelectorAll(".percentage");
-  observer.observe(skillContainer);
+    observer.observe(skillContainer);
+  }
 
   function updatePercentagePositions() {
-    const barWidth = document.querySelector(".bar").clientWidth;
-    percentages.forEach((percentage) => {
-      const widthPercentage = parseFloat(percentage.textContent) / 100;
+    const percEls = document.querySelectorAll(".percentage");
+    if (!percEls.length) return;
+    percEls.forEach((percentage) => {
+      const bar = percentage.parentElement?.querySelector(".bar");
+      if (!bar) return;
+      const barWidth = bar.clientWidth || 0;
+      const widthPercentage = parseFloat(percentage.textContent) / 100 || 0;
       percentage.style.left = `${barWidth * widthPercentage - 12.5}px`;
     });
   }
+  updatePercentagePositions();
 
-  updatePercentagePositions(); // Call initially
-  /* preloader
-   * -------------------------------------------------- */
+  /* ---------- Preloader ---------- */
   const ssPreloader = function () {
     const siteBody = document.querySelector("body");
     const preloader = document.querySelector("#preloader");
@@ -56,67 +58,48 @@
         }
       });
     });
+  };
 
-    // window.addEventListener('beforeunload' , function() {
-    //     siteBody.classList.remove('ss-show');
-    // });
-  }; // end ssPreloader
-
-  //
-  /* move header
-   * -------------------------------------------------- */
+  /* ---------- Sticky header ---------- */
   const ssMoveHeader = function () {
     const hdr = document.querySelector(".s-header");
     const hero = document.querySelector("#intro");
-    let triggerHeight;
-
     if (!(hdr && hero)) return;
 
+    let triggerHeight;
     setTimeout(function () {
       triggerHeight = hero.offsetHeight - 170;
     }, 300);
 
     window.addEventListener("scroll", function () {
-      let loc = window.scrollY;
+      const loc = window.scrollY;
 
-      if (loc > triggerHeight) {
-        hdr.classList.add("sticky");
-      } else {
-        hdr.classList.remove("sticky");
-      }
+      if (loc > triggerHeight) hdr.classList.add("sticky");
+      else hdr.classList.remove("sticky");
 
-      if (loc > triggerHeight + 20) {
-        hdr.classList.add("offset");
-      } else {
-        hdr.classList.remove("offset");
-      }
+      if (loc > triggerHeight + 20) hdr.classList.add("offset");
+      else hdr.classList.remove("offset");
 
-      if (loc > triggerHeight + 150) {
-        hdr.classList.add("scrolling");
-      } else {
-        hdr.classList.remove("scrolling");
-      }
+      if (loc > triggerHeight + 150) hdr.classList.add("scrolling");
+      else hdr.classList.remove("scrolling");
     });
-  }; // end ssMoveHeader
+  };
 
-  /* mobile menu
-   * ---------------------------------------------------- */
+  /* ---------- Mobile menu ---------- */
   const ssMobileMenu = function () {
     const toggleButton = document.querySelector(".s-header__menu-toggle");
     const mainNavWrap = document.querySelector(".s-header__nav");
     const siteBody = document.querySelector("body");
-
     if (!(toggleButton && mainNavWrap)) return;
 
-    toggleButton.addEventListener("click", function (event) {
-      event.preventDefault();
+    toggleButton.addEventListener("click", function (e) {
+      e.preventDefault();
       toggleButton.classList.toggle("is-clicked");
       siteBody.classList.toggle("menu-is-open");
     });
 
     mainNavWrap.querySelectorAll(".s-header__nav a").forEach(function (link) {
-      link.addEventListener("click", function (event) {
-        // at 800px and below
+      link.addEventListener("click", function () {
         if (window.matchMedia("(max-width: 800px)").matches) {
           toggleButton.classList.toggle("is-clicked");
           siteBody.classList.toggle("menu-is-open");
@@ -125,133 +108,100 @@
     });
 
     window.addEventListener("resize", function () {
-      // above 800px
       if (window.matchMedia("(min-width: 801px)").matches) {
-        if (siteBody.classList.contains("menu-is-open"))
-          siteBody.classList.remove("menu-is-open");
-        if (toggleButton.classList.contains("is-clicked"))
-          toggleButton.classList.remove("is-clicked");
+        siteBody.classList.remove("menu-is-open");
+        toggleButton.classList.remove("is-clicked");
       }
     });
-  }; // end ssMobileMenu
+  };
 
-  /* highlight active menu link on pagescroll
-   * ------------------------------------------------------ */
+  /* ---------- ScrollSpy (safe) ---------- */
   const ssScrollSpy = function () {
     const sections = document.querySelectorAll(".target-section");
-
-    // Add an event listener listening for scroll
-    window.addEventListener("scroll", navHighlight);
+    if (!sections.length) return;
 
     function navHighlight() {
-      // Get current scroll position
-      let scrollY = window.pageYOffset;
-
-      // Loop through sections to get height(including padding and border),
-      // top and ID values for each
+      const scrollY = window.pageYOffset;
       sections.forEach(function (current) {
-        const sectionHeight = current.offsetHeight;
-        const sectionTop = current.offsetTop - 50;
+        const sectionHeight = current.offsetHeight || 0;
+        const sectionTop = (current.offsetTop || 0) - 50;
         const sectionId = current.getAttribute("id");
+        if (!sectionId) return;
 
-        /* If our current scroll position enters the space where current section
-         * on screen is, add .current class to parent element(li) of the thecorresponding
-         * navigation link, else remove it. To know which link is active, we use
-         * sectionId variable we are getting while looping through sections as
-         * an selector
-         */
+        // 정확 매칭: href="#sectionId"
+        const link = document.querySelector(`.s-header__nav a[href="#${sectionId}"]`);
+        if (!link || !link.parentNode) return;
+
         if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-          document
-            .querySelector(".s-header__nav a[href*=" + sectionId + "]")
-            .parentNode.classList.add("current");
+          link.parentNode.classList.add("current");
         } else {
-          document
-            .querySelector(".s-header__nav a[href*=" + sectionId + "]")
-            .parentNode.classList.remove("current");
+          link.parentNode.classList.remove("current");
         }
       });
     }
-  }; // end ssScrollSpy
 
-  /* masonry
-   * ------------------------------------------------------ */
+    window.addEventListener("scroll", navHighlight);
+    navHighlight(); // 초기 1회
+  };
+
+  /* ---------- Masonry ---------- */
   const ssMasonry = function () {
     const containerBricks = document.querySelector(".bricks-wrapper");
-    if (!containerBricks) return;
+    if (!containerBricks || typeof imagesLoaded !== "function" || typeof Masonry !== "function") return;
 
     imagesLoaded(containerBricks, function () {
-      const msnry = new Masonry(containerBricks, {
+      new Masonry(containerBricks, {
         itemSelector: ".entry",
         columnWidth: ".grid-sizer",
         percentPosition: true,
         resize: true,
       });
     });
-  }; // end ssMasonry
+  };
 
   const ssMasonry2 = function () {
     const containerBricks = document.querySelector(".bricks-wrapper2");
-    if (!containerBricks) return;
+    if (!containerBricks || typeof imagesLoaded !== "function" || typeof Masonry !== "function") return;
 
     imagesLoaded(containerBricks, function () {
-      const msnry = new Masonry(containerBricks, {
+      new Masonry(containerBricks, {
         itemSelector: ".entry2",
         columnWidth: ".grid-sizer2",
         percentPosition: true,
         resize: true,
       });
     });
-  }; // end ssMasonry
+  };
 
-  // swiper
+  /* ---------- Swiper ---------- */
   const ssSwiper = function () {
-    const testimonialsSwiper = new Swiper(".s-testimonials__slider", {
+    if (typeof Swiper !== "function") return;
+    const sliderEl = document.querySelector(".s-testimonials__slider");
+    if (!sliderEl) return;
+
+    new Swiper(".s-testimonials__slider", {
       slidesPerView: 1,
-      pagination: {
-        el: ".swiper-pagination",
-        clickable: true,
-      },
+      pagination: { el: ".swiper-pagination", clickable: true },
       breakpoints: {
-        // when window width is > 400px
-        401: {
-          slidesPerView: 1,
-          spaceBetween: 20,
-        },
-        // when window width is > 800px
-        801: {
-          slidesPerView: 2,
-          spaceBetween: 50,
-        },
-        // when window width is > 1180px
-        1181: {
-          slidesPerView: 2,
-          spaceBetween: 100,
-        },
+        401: { slidesPerView: 1, spaceBetween: 20 },
+        801: { slidesPerView: 2, spaceBetween: 50 },
+        1181: { slidesPerView: 2, spaceBetween: 100 },
       },
     });
 
-    // 스와이프 이벤트 중지
-    const slideLinks = document.querySelectorAll(".s-testimonials__slide a");
-    slideLinks.forEach((link) => {
-      link.addEventListener("click", function (event) {
-        event.stopPropagation();
-      });
+    document.querySelectorAll(".s-testimonials__slide a").forEach((link) => {
+      link.addEventListener("click", (e) => e.stopPropagation());
     });
-  }; // end ssSwiper
+  };
 
-  /* mailchimp form
-   * ---------------------------------------------------- */
+  /* ---------- Mailchimp ---------- */
   const ssMailChimpForm = function () {
     const mcForm = document.querySelector("#mc-form");
-
     if (!mcForm) return;
 
-    // Add novalidate attribute
     mcForm.setAttribute("novalidate", true);
 
-    // Field validation
     function hasError(field) {
-      // Don't validate submits, buttons, file and reset inputs, and disabled fields
       if (
         field.disabled ||
         field.type === "file" ||
@@ -261,234 +211,153 @@
       )
         return;
 
-      // Get validity
-      let validity = field.validity;
-
-      // If valid, return null
+      const validity = field.validity;
       if (validity.valid) return;
-
-      // If field is required and empty
       if (validity.valueMissing) return "Please enter an email address.";
-
-      // If not the right type
-      if (validity.typeMismatch) {
-        if (field.type === "email")
-          return "Please enter a valid email address.";
-      }
-
-      // If pattern doesn't match
-      if (validity.patternMismatch) {
-        // If pattern info is included, return custom error
-        if (field.hasAttribute("title")) return field.getAttribute("title");
-
-        // Otherwise, generic error
-        return "Please match the requested format.";
-      }
-
-      // If all else fails, return a generic catchall error
+      if (validity.typeMismatch && field.type === "email")
+        return "Please enter a valid email address.";
+      if (validity.patternMismatch) return field.getAttribute("title") || "Please match the requested format.";
       return "The value you entered for this field is invalid.";
     }
 
-    // Show error message
     function showError(field, error) {
-      // Get field id or name
-      let id = field.id || field.name;
-      if (!id) return;
-
-      let errorMessage = field.form.querySelector(".mc-status");
-
-      // Update error message
+      const errorMessage = field.form.querySelector(".mc-status");
+      if (!errorMessage) return;
       errorMessage.classList.remove("success-message");
       errorMessage.classList.add("error-message");
       errorMessage.innerHTML = error;
     }
 
-    // Display form status (callback function for JSONP)
     window.displayMailChimpStatus = function (data) {
-      // Make sure the data is in the right format and that there's a status container
-      if (!data.result || !data.msg || !mcStatus) return;
-
-      // Update our status message
-      mcStatus.innerHTML = data.msg;
-
-      // If error, add error class
+      if (!data.result || !data.msg || !window.mcStatus) return;
+      window.mcStatus.innerHTML = data.msg;
       if (data.result === "error") {
-        mcStatus.classList.remove("success-message");
-        mcStatus.classList.add("error-message");
-        return;
+        window.mcStatus.classList.remove("success-message");
+        window.mcStatus.classList.add("error-message");
+      } else {
+        window.mcStatus.classList.remove("error-message");
+        window.mcStatus.classList.add("success-message");
       }
-
-      // Otherwise, add success class
-      mcStatus.classList.remove("error-message");
-      mcStatus.classList.add("success-message");
     };
 
-    // Submit the form
     function submitMailChimpForm(form) {
-      let url = cfg.mailChimpURL;
-      let emailField = form.querySelector("#mce-EMAIL");
-      let serialize =
-        "&" +
-        encodeURIComponent(emailField.name) +
-        "=" +
-        encodeURIComponent(emailField.value);
+      const urlBase = (window.cfg && window.cfg.mailChimpURL) || "";
+      const emailField = form.querySelector("#mce-EMAIL");
+      if (!urlBase || !emailField) return;
 
-      if (url == "") return;
+      let url = urlBase.replace("/post?u=", "/post-json?u=");
+      url += "&" + encodeURIComponent(emailField.name) + "=" + encodeURIComponent(emailField.value) + "&c=displayMailChimpStatus";
 
-      url = url.replace("/post?u=", "/post-json?u=");
-      url += serialize + "&c=displayMailChimpStatus";
-
-      // Create script with url and callback (if specified)
-      var ref = window.document.getElementsByTagName("script")[0];
-      var script = window.document.createElement("script");
+      const ref = window.document.getElementsByTagName("script")[0];
+      const script = window.document.createElement("script");
       script.src = url;
 
-      // Create global variable for the status container
       window.mcStatus = form.querySelector(".mc-status");
-      window.mcStatus.classList.remove("error-message", "success-message");
-      window.mcStatus.innerText = "Submitting...";
+      if (window.mcStatus) {
+        window.mcStatus.classList.remove("error-message", "success-message");
+        window.mcStatus.innerText = "Submitting...";
+      }
 
-      // Insert script tag into the DOM
       ref.parentNode.insertBefore(script, ref);
-
-      // After the script is loaded (and executed), remove it
-      script.onload = function () {
-        this.remove();
-      };
+      script.onload = function () { this.remove(); };
     }
 
-    // Check email field on submit
-    mcForm.addEventListener(
-      "submit",
-      function (event) {
-        event.preventDefault();
+    mcForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const emailField = event.target.querySelector("#mce-EMAIL");
+      const error = hasError(emailField);
+      if (error) {
+        showError(emailField, error);
+        emailField.focus();
+        return;
+      }
+      submitMailChimpForm(this);
+    }, false);
+  };
 
-        let emailField = event.target.querySelector("#mce-EMAIL");
-        let error = hasError(emailField);
-
-        if (error) {
-          showError(emailField, error);
-          emailField.focus();
-          return;
-        }
-
-        submitMailChimpForm(this);
-      },
-      false
-    );
-  }; // end ssMailChimpForm
-
-  /* Lightbox
-   * ------------------------------------------------------ */
+  /* ---------- Lightbox ---------- */
   const ssLightbox = function () {
-    // video lightbox
-    const videoLightbox = function () {
-      const videoLink = document.querySelector(".s-intro__content-video-btn");
-      if (!videoLink) return;
-
-      videoLink.addEventListener("click", function (event) {
+    const videoLink = document.querySelector(".s-intro__content-video-btn");
+    if (videoLink) {
+      videoLink.addEventListener("click", function (e) {
         const vLink = this.getAttribute("href");
         const iframe = "<iframe src='" + vLink + "' frameborder='0'></iframe>";
-
-        event.preventDefault();
-
+        e.preventDefault();
         const instance = basicLightbox.create(iframe);
         instance.show();
       });
-    };
+    }
 
-    // portfolio lightbox
-    const folioLightbox = function () {
-      const folioLinks = document.querySelectorAll(".brick .entry__link ");
-      const modals = [];
+    const folioLinks = document.querySelectorAll(".brick .entry__link ");
+    if (!folioLinks.length) return;
 
-      folioLinks.forEach(function (link) {
-        let modalbox = link.getAttribute("href");
-        let instance = basicLightbox.create(document.querySelector(modalbox), {
-          onShow: function (instance) {
-            //detect Escape key press
-            document.addEventListener("keydown", function (event) {
-              event = event || window.event;
-              if (event.key === "Escape") {
-                instance.close();
-              }
-            });
-          },
-        });
-        modals.push(instance);
+    const modals = [];
+    folioLinks.forEach(function (link) {
+      const modalbox = link.getAttribute("href");
+      const modalEl = document.querySelector(modalbox);
+      if (!modalEl || typeof basicLightbox === "undefined") return;
+      const instance = basicLightbox.create(modalEl, {
+        onShow: function (inst) {
+          document.addEventListener("keydown", function (event) {
+            if ((event || window.event).key === "Escape") inst.close();
+          });
+        },
       });
+      modals.push(instance);
+    });
 
-      folioLinks.forEach(function (link, index) {
-        link.addEventListener("click", function (event) {
-          event.preventDefault();
-          modals[index].show();
-        });
+    folioLinks.forEach(function (link, index) {
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (modals[index]) modals[index].show();
       });
-    };
+    });
+  };
 
-    videoLightbox();
-    folioLightbox();
-  }; // ssLightbox
-
-  /* alert boxes
-   * ------------------------------------------------------ */
+  /* ---------- Alert boxes ---------- */
   const ssAlertBoxes = function () {
     const boxes = document.querySelectorAll(".alert-box");
-
+    if (!boxes.length) return;
     boxes.forEach(function (box) {
       box.addEventListener("click", function (event) {
         if (event.target.matches(".alert-box__close")) {
           event.stopPropagation();
           event.target.parentElement.classList.add("hideit");
-
-          setTimeout(function () {
-            box.style.display = "none";
-          }, 500);
+          setTimeout(function () { box.style.display = "none"; }, 500);
         }
       });
     });
-  }; // end ssAlertBoxes
+  };
 
-  /* Back to Top
-   * ------------------------------------------------------ */
+  /* ---------- Back to Top ---------- */
   const ssBackToTop = function () {
     const pxShow = 900;
     const goTopButton = document.querySelector(".ss-go-top");
-
     if (!goTopButton) return;
 
-    // Show or hide the button
     if (window.scrollY >= pxShow) goTopButton.classList.add("link-is-visible");
-
     window.addEventListener("scroll", function () {
-      if (window.scrollY >= pxShow) {
-        if (!goTopButton.classList.contains("link-is-visible"))
-          goTopButton.classList.add("link-is-visible");
-      } else {
-        goTopButton.classList.remove("link-is-visible");
-      }
+      if (window.scrollY >= pxShow) goTopButton.classList.add("link-is-visible");
+      else goTopButton.classList.remove("link-is-visible");
     });
-  }; // end ssBackToTop
+  };
 
-  /* smoothscroll
-   * ------------------------------------------------------ */
+  /* ---------- Smooth scroll ---------- */
   const ssMoveTo = function () {
+    if (typeof MoveTo !== "function") return;
+    const triggers = document.querySelectorAll(".smoothscroll");
+    if (!triggers.length) return;
+
     const easeFunctions = {
-      easeInQuad: function (t, b, c, d) {
-        t /= d;
-        return c * t * t + b;
-      },
-      easeOutQuad: function (t, b, c, d) {
-        t /= d;
-        return -c * t * (t - 2) + b;
-      },
-      easeInOutQuad: function (t, b, c, d) {
+      easeInQuad: (t, b, c, d) => (c * (t /= d) * t + b),
+      easeOutQuad: (t, b, c, d) => (-c * (t /= d) * (t - 2) + b),
+      easeInOutQuad: (t, b, c, d) => {
         t /= d / 2;
         if (t < 1) return (c / 2) * t * t + b;
         t--;
         return (-c / 2) * (t * (t - 2) - 1) + b;
       },
-      easeInOutCubic: function (t, b, c, d) {
+      easeInOutCubic: (t, b, c, d) => {
         t /= d / 2;
         if (t < 1) return (c / 2) * t * t * t + b;
         t -= 2;
@@ -496,31 +365,22 @@
       },
     };
 
-    const triggers = document.querySelectorAll(".smoothscroll");
-
     const moveTo = new MoveTo(
-      {
-        tolerance: 0,
-        duration: 1200,
-        easing: "easeInOutCubic",
-        container: window,
-      },
+      { tolerance: 0, duration: 1200, easing: "easeInOutCubic", container: window },
       easeFunctions
     );
 
-    triggers.forEach(function (trigger) {
-      moveTo.registerTrigger(trigger);
-    });
-  }; // end ssMoveTo
+    triggers.forEach((trigger) => moveTo.registerTrigger(trigger));
+  };
 
-  /* Initialize
-   * ------------------------------------------------------ */
+  /* ---------- Init ---------- */
   (function ssInit() {
     ssPreloader();
     ssMoveHeader();
     ssMobileMenu();
     ssScrollSpy();
     ssMasonry();
+    ssMasonry2();
     ssSwiper();
     ssMailChimpForm();
     ssLightbox();

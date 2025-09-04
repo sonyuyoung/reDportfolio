@@ -1,87 +1,96 @@
-// IntersectionObserver 생성
+// ============== IntersectionObserver ==============
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      // 화면에 나타나면 animate 클래스를 추가합니다.
-      entry.target.classList.add("animate");
-    } else {
-      // 화면에서 사라지면 animate 클래스를 제거합니다.
-      entry.target.classList.remove("animate");
-    }
+    if (entry.isIntersecting) entry.target.classList.add("animate");
+    else entry.target.classList.remove("animate");
   });
 });
 
-// 스킬 컨테이너 요소를 관찰합니다.
+// 스킬 컨테이너가 없을 수도 있으니 가드
 const skillContainer = document.querySelector(".skills-container");
-observer.observe(skillContainer);
+if (skillContainer) observer.observe(skillContainer);
 
-// 백분율 위치를 업데이트하는 함수
+// ============== 백분율 위치 업데이트 ==============
+// .bar가 1개 이상 존재하는지 확인하고, 각 .percentage를 자기 바 기준으로 계산
 function updatePercentagePositions() {
-  const barWidth = document.querySelector(".bar").clientWidth;
+  const bars = document.querySelectorAll(".bar");
   const percentages = document.querySelectorAll(".percentage");
+  if (!bars.length || !percentages.length) return;
+
   percentages.forEach((percentage) => {
+    const bar = percentage.parentElement?.querySelector(".bar");
+    const barWidth = bar?.clientWidth || 0;
+    if (!barWidth) return;
     const widthPercentage = parseFloat(percentage.textContent) / 100;
+    // 배지 가운데 맞춘 오프셋(12.5px) — 필요에 맞게 조정 가능
     percentage.style.left = `${barWidth * widthPercentage - 12.5}px`;
   });
 }
-
-// 초기에 백분율 위치를 업데이트합니다.
 updatePercentagePositions();
 
-// 슬라이드 추가코드
+// ============== 슬라이드 ==============
+// 현재 페이지에 .mySlides가 없을 때를 대비한 가드 + 인덱스 보정
+let slideIndex = 0;
+
+function showSlides(n) {
+  const slides = document.getElementsByClassName("mySlides");
+  if (!slides || slides.length === 0) return; // ★ 가드
+
+  // n이 넘어오면 설정(없으면 기존 인덱스 유지)
+  if (typeof n === "number") slideIndex = n;
+
+  // 인덱스 보정
+  if (slideIndex >= slides.length) slideIndex = 0;
+  if (slideIndex < 0) slideIndex = slides.length - 1;
+
+  // 모두 숨기고 현재만 표시
+  for (let i = 0; i < slides.length; i++) slides[i].style.display = "none";
+  slides[slideIndex].style.display = "block";
+}
+
+// 모달 열릴 때 인덱스 초기화만
 function resetSlideIndex() {
-  slideIndex = 0; // 모달이 열릴 때 슬라이드 인덱스를 0으로 초기화
+  slideIndex = 0;
+  showSlides(slideIndex);
 }
 
-var slideIndex = 0;
-showSlides();
-
-function showSlides() {
-  var i;
-  var slides = document.getElementsByClassName("mySlides");
-  for (i = 0; i < slides.length; i++) {
-    slides[i].style.display = "none"; // 모든 슬라이드를 숨깁니다.
-  }
-  if (slideIndex >= slides.length) {
-    slideIndex = 0; // 마지막 슬라이드일 경우 처음 슬라이드로 돌아갑니다.
-  }
-  if (slideIndex < 0) {
-    slideIndex = slides.length - 1; // 첫 번째 슬라이드일 경우 마지막 슬라이드로 이동합니다.
-  }
-  slides[slideIndex].style.display = "block"; // 현재 슬라이드를 표시합니다.
-}
-
-function prevSlide() {
+// 이전/다음 버튼 핸들러(HTML에서 onclick 호출 시에도 안전)
+function prevSlide(e) {
+  if (e && e.preventDefault) e.preventDefault();
   slideIndex--;
-  var slides = document.getElementsByClassName("mySlides"); // 이 부분을 추가합니다.
-  if (slideIndex < 0) {
-    slideIndex = slides.length - 1; // 첫 번째 슬라이드일 경우 마지막 슬라이드로 이동합니다.
-  }
-  showSlides(); // 이전 슬라이드를 표시합니다.
+  showSlides(slideIndex);
 }
-
-function nextSlide() {
+function nextSlide(e) {
+  if (e && e.preventDefault) e.preventDefault();
   slideIndex++;
-  var slides = document.getElementsByClassName("mySlides"); // 이 부분을 추가합니다.
-  if (slideIndex >= slides.length) {
-    slideIndex = 0; // 마지막 슬라이드일 경우 처음 슬라이드로 돌아갑니다.
-  }
-  showSlides(); // 다음 슬라이드를 표시합니다.
+  showSlides(slideIndex);
 }
-// 모달 닫기 버튼 클릭 시 스크롤 이벤트 중지
-var modalCloseBtn = document.querySelector(".modal-close-btn");
-modalCloseBtn.addEventListener("click", function () {
-  enableScroll(); // 스크롤 이벤트 다시 활성화
-  // 슬라이드 이벤트 핸들러 제거
-  deregisterSlideEvent();
-});
 
-// 슬라이드 이벤트 핸들러 해제 함수
+// 초기 렌더 — 슬라이드가 없으면 아무 일도 안 함(가드가 막아줌)
+document.addEventListener("DOMContentLoaded", () => showSlides(slideIndex));
+
+// ============== 모달 닫힘 처리 ==============
+// 선택자가 없을 수 있으므로 가드
+const modalCloseBtn = document.querySelector(".modal-close-btn");
+if (modalCloseBtn) {
+  modalCloseBtn.addEventListener("click", function () {
+    // enableScroll()이 전역에 있을 때만 실행
+    if (typeof enableScroll === "function") enableScroll();
+    deregisterSlideEvent();
+  });
+}
+
+// HTML에서 a.prev/a.next에 inline onclick을 쓰고 있으면
+// removeEventListener로는 지워지지 않습니다. (inline 핸들러 != addEventListener)
+// 다만 null 에러는 막아야 하므로 널 가드만 둡니다.
 function deregisterSlideEvent() {
-  // 슬라이드 버튼에 추가된 이벤트 핸들러 제거
   const prevButton = document.querySelector(".prev");
   const nextButton = document.querySelector(".next");
-
-  prevButton.removeEventListener("click", prevSlide);
-  nextButton.removeEventListener("click", nextSlide);
+  if (prevButton) {
+    // addEventListener로 등록한 적이 없는 경우 removeEventListener는 효과 없음
+    try { prevButton.removeEventListener("click", prevSlide); } catch (_) {}
+  }
+  if (nextButton) {
+    try { nextButton.removeEventListener("click", nextSlide); } catch (_) {}
+  }
 }
