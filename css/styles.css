@@ -2829,7 +2829,7 @@ img.u-pull-left {
   color: var(--color-text-light);
 }
 .section-header .desc2{
-  
+  color: #737373!important;
   font-size: 1em;
   font-weight: 300;
   line-height: 1.8;
