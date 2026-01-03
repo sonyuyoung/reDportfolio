@@ -43,7 +43,8 @@
   display: none; /* Chrome/Safari/Edge */
 }
 
-/*  */
+/* 여기까지 상세 */
+
 .svg-container {
   width: 3em; /* 이미지의 너비 */
   height: 100px; /* 이미지의 높이 */
