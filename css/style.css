@@ -7,6 +7,7 @@
   #detailpage .bricks-wrapper .brick,
   #detailpage .bricks-wrapper .brick2 {
     width: 33.3333% !important;
+    overflow: hidden;
   }
 
   /* 🔸 brick--double 무력화 */
