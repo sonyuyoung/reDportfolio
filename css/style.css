@@ -1,10 +1,33 @@
+/* ===============================
+   DETAILPAGE 썸네일: PC에서 3개씩
+   =============================== */
+@media screen and (min-width: 1000px) {
+  /* 🔸 폭은 정확히 3열 */
+  #detailpage .bricks-wrapper .grid-sizer,
+  #detailpage .bricks-wrapper .brick,
+  #detailpage .bricks-wrapper .brick2 {
+    width: 33.3333% !important;
+  }
+
+  /* 🔸 brick--double 무력화 */
+  #detailpage .bricks-wrapper .brick--double {
+    width: 33.3333% !important;
+  }
+
+  /* ✅ 간격은 썸네일 안쪽으로 */
+  #detailpage .entry__thumb {
+    padding: 6px; /* 원하는 간격 */
+    box-sizing: border-box;
+  }
+}
+
 /* 모달 자체를 화면 꽉 채우고 흰 배경 제거 */
 .modal-popup--dp {
   width: 100%;
   max-width: none;
   margin: 0;
   padding: 0;
-  background: #000; /* ✅ 흰색 제거 */
+  background: #fff; /* ✅ 흰색 제거 */
   color: #fff;
 }
 
@@ -14,7 +37,7 @@
   overflow-y: auto; /* ✅ 스크롤 */
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  background: #000; /* ✅ 여백이 보여도 검정 */
+  background: #fff; /* ✅ 여백이 보여도 검정 */
   padding: 0; /* ✅ 여백 0 */
 }
 
