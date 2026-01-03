@@ -3462,7 +3462,7 @@ img.u-pull-left {
 }
 
 .s-intro__content-title {
-  --text-title-size: 8.8rem;
+  --text-title-size: 7rem;
   --text-multiplier: 1;
   font-weight: 600;
   font-size: calc(var(--text-title-size) * var(--text-multiplier));
