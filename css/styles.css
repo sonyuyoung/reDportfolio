@@ -3445,7 +3445,6 @@ img.u-pull-left {
   background-color: var(--color-1);
   border-color: var(--color-1);smoothscroll
 }
-
 .s-intro__content-video-btn:focus svg path,
 .s-intro__content-video-btn:hover svg path {
   fill: white;
@@ -3892,7 +3891,7 @@ img.u-pull-left {
 }
 
 /*  */
-.bricks-wrapper .entry__link::after {
+/* .bricks-wrapper .entry__link::after {
   z-index: 1;
   display: block;
   content: "...";
@@ -3913,7 +3912,7 @@ img.u-pull-left {
   position: absolute;
   left: 50%;
   top: 50%;
-}
+} */
 
 .bricks-wrapper .entry {
   position: relative;
@@ -3980,7 +3979,7 @@ img.u-pull-left {
 }
 
 
-/* on hover
+/* on hover 이미지 호버
  */
 .bricks-wrapper .entry:hover .entry__link::before {
   opacity: 1;
@@ -4097,7 +4096,7 @@ img.u-pull-left {
   display: none;
 }
 
-.modal-popup__details {
+/* .modal-popup__details {
   background-color: rgba(0, 0, 0, 0.3);
   font-size: var(--text-xs);
   line-height: var(--vspace-1_25);
@@ -4106,7 +4105,7 @@ img.u-pull-left {
   position: absolute;
   top: var(--vspace-1);
   right: var(--vspace-1);
-}
+} */
 
 .modal-popup__details:focus,
 .modal-popup__details:hover {

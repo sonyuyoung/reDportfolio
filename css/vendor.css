@@ -171,13 +171,13 @@ pre[class*="language-"] {
   z-index: 10;
 }
 
-.swiper-container-3d .swiper-slide-shadow-left {
+/* .swiper-container-3d .swiper-slide-shadow-left {
   background-image: linear-gradient(
     to left,
     rgba(0, 0, 0, 0.5),
     rgba(0, 0, 0, 0)
   );
-}
+} */
 
 .swiper-container-3d .swiper-slide-shadow-right {
   background-image: linear-gradient(
@@ -684,7 +684,7 @@ button.swiper-pagination-bullet {
 
 /* ===================================================================
  * # Basiclightbox
- *
+ * 모달
  *
  * ------------------------------------------------------------------- */
 .basicLightbox {
@@ -722,14 +722,14 @@ button.swiper-pagination-bullet {
   opacity: 1;
 }
 
-.basicLightbox__placeholder {
+/* .basicLightbox__placeholder {
   max-width: 100%;
   transform: scale(0.9);
   transition: all 0.4s ease;
   z-index: 1;
   will-change: transform;
   opacity: 0;
-}
+} */
 
 .basicLightbox__placeholder > iframe:first-child:last-child,
 .basicLightbox__placeholder > img:first-child:last-child,

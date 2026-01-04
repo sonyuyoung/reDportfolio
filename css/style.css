@@ -1,4 +1,64 @@
 /* ===============================
+   DETAILPAGE 썸네일 hover FIX
+   =============================== */
+
+/* 1. 기존 link 오버레이 비활성화 (detailpage만) */
+#detailpage .entry__link::before,
+#detailpage .entry__link::after {
+  display: none !important;
+}
+
+/* 2. thumb를 기준 컨테이너로 */
+#detailpage .entry__thumb {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 3. 배경 오버레이 */
+#detailpage .entry__thumb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+/* 4. 중앙 아이콘 */
+#detailpage .entry__thumb::after {
+  content: "...";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  font-size: 2.4rem;
+  color: #fff;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+/* 5. 이미지 확대 */
+#detailpage .entry__thumb img {
+  transition: transform 0.3s ease;
+}
+
+/* 6. hover 동작 */
+#detailpage .entry:hover .entry__thumb::before {
+  opacity: 1;
+}
+
+#detailpage .entry:hover .entry__thumb::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+#detailpage .entry:hover .entry__thumb img {
+  transform: scale(1.05);
+}
+
+/* ===============================
    DETAILPAGE 썸네일: PC에서 3개씩
    =============================== */
 @media screen and (min-width: 1000px) {
@@ -17,23 +77,44 @@
 
   /* ✅ 간격은 썸네일 안쪽으로 */
   #detailpage .entry__thumb {
-    padding: 6px; /* 원하는 간격 */
     box-sizing: border-box;
   }
 }
 /* ===============================
    DETAILPAGE 썸네일: 모바일 간격 (마진으로)
    =============================== */
-@media screen and (max-width: 999px) {
-  /* 모바일에서는 패딩 제거(원하면) */
-  #detailpage .entry__thumb {
-    padding: 0;
-  }
-
-  /* 썸네일 카드(각 brick) 아래 간격 */
+@media screen and (min-width: 1000px) {
+  /* 🔸 폭은 정확히 3열 */
+  #detailpage .bricks-wrapper .grid-sizer,
   #detailpage .bricks-wrapper .brick,
   #detailpage .bricks-wrapper .brick2 {
-    padding: 3px; /* 원하는 값으로 조절 */
+    width: 33.3333% !important;
+  }
+
+  /* 🔸 brick--double 무력화 */
+  #detailpage .bricks-wrapper .brick--double {
+    width: 33.3333% !important;
+  }
+
+  /* ✅ 여백은 카드(링크)에 */
+  #detailpage .entry__link,
+  #detailpage .entry__link2 {
+    display: block;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* ✅ thumb는 확대를 자르는 역할만 */
+  #detailpage .entry__thumb {
+    padding: 6px;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  /* 안전장치 (크롬 삐침 방지) */
+  #detailpage .entry__thumb img {
+    backface-visibility: hidden;
+    will-change: transform;
   }
 }
 
