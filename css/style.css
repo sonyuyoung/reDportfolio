@@ -21,6 +21,21 @@
     box-sizing: border-box;
   }
 }
+/* ===============================
+   DETAILPAGE 썸네일: 모바일 간격 (마진으로)
+   =============================== */
+@media screen and (max-width: 999px) {
+  /* 모바일에서는 패딩 제거(원하면) */
+  #detailpage .entry__thumb {
+    padding: 0;
+  }
+
+  /* 썸네일 카드(각 brick) 아래 간격 */
+  #detailpage .bricks-wrapper .brick,
+  #detailpage .bricks-wrapper .brick2 {
+    padding: 3px; /* 원하는 값으로 조절 */
+  }
+}
 
 /* 모달 자체를 화면 꽉 채우고 흰 배경 제거 */
 .modal-popup--dp {
