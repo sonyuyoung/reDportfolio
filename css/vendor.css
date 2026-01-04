@@ -702,7 +702,7 @@ button.swiper-pagination-bullet {
   z-index: 1000;
   will-change: opacity;
 }
-
+/* 모달닫기 */
 .basicLightbox::after {
   content: "";
   position: absolute;
@@ -715,6 +715,7 @@ button.swiper-pagination-bullet {
   background-size: 1.6rem 1.6rem;
   background-repeat: no-repeat;
   cursor: pointer;
+  z-index: 9;
 }
 
 .basicLightbox--visible {

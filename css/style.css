@@ -66,6 +66,46 @@
   height: 0;
   display: none; /* Chrome/Safari/Edge */
 }
+/* ===============================
+   DETAILPAGE MODAL - MOBILE FIX
+   =============================== */
+@media (max-width: 999px) {
+  /* 디테일 모달은 화면 전체 레이어 */
+  .modal-popup--dp {
+    inset: 0;
+    height: 100vh;
+    background: #000; /* ← 진짜 흰색 제거 */
+    overflow: hidden;
+  }
+
+  /* ✅ 닫기 버튼을 화면 기준으로 고정 */
+  .modal-popup--dp .mfp-close,
+  .modal-popup--dp .modal-popup__close {
+    position: fixed !important;
+    top: 14px !important;
+    right: 14px !important;
+    z-index: 99999 !important;
+
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff !important;
+    opacity: 1 !important;
+  }
+
+  /* 🔑 닫기 버튼 영역 확보 */
+  .modal-popup--dp .dp-scroll {
+    height: 100vh;
+    overflow-y: auto;
+    padding-top: 70px; /* ← 버튼 안 가리게 */
+    box-sizing: border-box;
+    background: #000;
+    z-index: 9;
+  }
+}
 
 /* 여기까지 상세 */
 
