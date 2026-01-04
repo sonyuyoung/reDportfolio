@@ -124,18 +124,18 @@
   max-width: none;
   margin: 0;
   padding: 0;
-  background: #fff; /* ✅ 흰색 제거 */
+  background: #fff;
   color: #fff;
 }
 
 /* ✅ 모달 내부에서 스크롤 되게 (body 잠김 대응) */
 .dp-scroll {
-  height: 100vh; /* 화면 전체 사용 */
+  height: auto; /* 화면 전체 사용 */
   overflow-y: auto; /* ✅ 스크롤 */
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  background: #fff; /* ✅ 여백이 보여도 검정 */
-  padding: 0; /* ✅ 여백 0 */
+  background: #fff !important; /* ✅ 여백이 보여도 검정 */
+  padding: 0 !important; /* ✅ 여백 0 */
 }
 
 /* ✅ 이미지 조각을 “붙여서” 보여주기 */
