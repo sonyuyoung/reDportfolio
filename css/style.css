@@ -141,12 +141,27 @@
 /* ✅ 이미지 조각을 “붙여서” 보여주기 */
 .dp-scroll img {
   display: block; /* inline-gap 제거 */
-  width: 600px; /* 원하는 폭 */
+  width: 700px; /* 원하는 폭 */
   max-width: 100vw; /* 모바일 대응 */
   height: auto;
   margin: 0 auto; /* 가운데 정렬 */
 }
-
+/* 추가 */
+.dp-scroll_wide {
+  height: 100vh; /* 화면 전체 사용 */
+  overflow-y: auto; /* ✅ 스크롤 */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: #fff !important; /* ✅ 여백이 보여도 검정 */
+  padding: 5px 0; /* ✅ 여백 0 */
+}
+.dp-scroll_wide img {
+  display: block; /* inline-gap 제거 */
+  width: 1200px; /* 원하는 폭 */
+  max-width: 100vw; /* 모바일 대응 */
+  height: auto;
+  margin: 0 auto; /* 가운데 정렬 */
+}
 /* 혹시 모달 플러그인이 기본으로 img에 margin 넣는 경우 대비 */
 .dp-scroll img + img {
   margin-top: 0 !important; /* ✅ 이미지 사이 간격 0 */
